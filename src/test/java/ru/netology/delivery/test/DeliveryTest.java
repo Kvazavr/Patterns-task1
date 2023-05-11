@@ -1,11 +1,15 @@
 package ru.netology.delivery.test;
 
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import ru.netology.delivery.data.DataGenerator;
 
-import static com.codeborne.selenide.Selenide.open;
+import java.time.Duration;
+
+import static com.codeborne.selenide.Selenide.*;
 
 class DeliveryTest {
 
@@ -22,6 +26,25 @@ class DeliveryTest {
         var firstMeetingDate = DataGenerator.generateDate(daysToAddForFirstMeeting);
         var daysToAddForSecondMeeting = 7;
         var secondMeetingDate = DataGenerator.generateDate(daysToAddForSecondMeeting);
+        open("http://localhost:9999/");
+        $("[type = text]").setValue(generateCity(locale));
+        $("[data-test-id=date]").click();
+        $("[data-test-id=date] [value]").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id=date] [value]").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id=date] [value]").setValue(firstMeetingDate);
+        $("[name = name]").setValue(generateName(locale));
+        $("[name = phone]").setValue(generatePhone(locale));
+        $("[data-test-id=agreement]").click();
+        $(".button__text").click();
+        $(".notification__content").shouldHave(Condition.text("Встреча успешно забронирована на " + firstMeetingDate), Duration.ofSeconds(15)).shouldBe(Condition.visible);
+        $("[data-test-id=date]").click();
+        $("[data-test-id=date] [value]").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id=date] [value]").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id=date] [value]").setValue(secondMeetingDate);
+        $(".button__text").click();
+        $(".notification__content").shouldHave(Condition.text("У вас уже запланирована встреча на другую дату. Перепланировать?")).shouldBe(Condition.visible);
+        $x("Перепланировать").click();
+        $(".notification__content").shouldHave(Condition.text("Встреча успешно забронирована на " + secondMeetingDate)).shouldBe(Condition.visible);
         // TODO: добавить логику теста в рамках которого будет выполнено планирование и перепланирование встречи.
         // Для заполнения полей формы можно использовать пользователя validUser и строки с датами в переменных
         // firstMeetingDate и secondMeetingDate. Можно также вызывать методы generateCity(locale),
