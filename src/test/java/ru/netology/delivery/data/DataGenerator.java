@@ -10,11 +10,8 @@ import java.util.Locale;
 import java.util.Random;
 
 public class DataGenerator {
-    private static Faker faker;
+    private static final Faker faker = new Faker(new Locale("en"));
 
-    static void setFaker() {
-        Faker faker = new Faker(new Locale("ru"));
-    }
     private DataGenerator() {
     }
 
